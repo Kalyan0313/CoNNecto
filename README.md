@@ -3,8 +3,8 @@
 A modern, neon-styled LinkedIn-like community platform built with React, Node.js, Express, and MongoDB.
 
 ## 🚀 Live Demo
-- **Frontend**: [Deploy to Vercel/Netlify]
-- **Backend**: [Deploy to Render/Railway]
+- **Frontend**: [https://co-n-necto.vercel.app/]
+- **Backend**: [https://connecto-backend-7uae.onrender.com]
 
 ## 📋 Features Status
 
@@ -19,7 +19,6 @@ A modern, neon-styled LinkedIn-like community platform built with React, Node.js
 ### 🎨 **Designed/UI Only (Dummy Data)**
 - **Search Functionality**: UI components created but not connected to backend
 - **Network Page**: Connection suggestions and network stats (mock data)
-- **Notifications**: Notification system UI with dummy notifications
 - **Trending Topics**: Sidebar trending topics with mock data
 - **Bookmarks**: Bookmark functionality UI (not implemented)
 - **User Activity**: Recent activity feeds with mock data
@@ -91,29 +90,6 @@ A modern, neon-styled LinkedIn-like community platform built with React, Node.js
    JWT_SECRET=your_super_secret_jwt_key
    NODE_ENV=production
    ```
-
-### Option 2: Netlify (Frontend) + Railway (Backend)
-
-#### Frontend Deployment (Netlify)
-1. **Deploy to Netlify**
-   - Go to [netlify.com](https://netlify.com)
-   - Connect your GitHub repository
-   - Set build settings:
-     - **Base directory**: `client`
-     - **Build command**: `npm run build`
-     - **Publish directory**: `dist`
-
-2. **Environment Variables**
-   ```
-   VITE_API_URL=https://your-backend-url.railway.app
-   ```
-
-#### Backend Deployment (Railway)
-1. **Deploy to Railway**
-   - Go to [railway.app](https://railway.app)
-   - Connect your GitHub repository
-   - Set root directory to `server`
-   - Add environment variables as above
 
 ## 📦 Local Development Setup
 
@@ -212,29 +188,6 @@ connecto/
 ### Users
 - `GET /api/users/:id` - Get user profile
 - `PUT /api/users/profile` - Update user profile
-
-## 🎨 UI Components
-
-### Fully Functional
-- **GlowCard**: Reusable card component with neon effects
-- **GlowButton**: Interactive button with glow animations
-- **PostCard**: Post display with like/comment functionality
-- **Navbar**: Responsive navigation with user authentication
-- **Sidebar**: Navigation sidebar with user stats
-
-### UI Only (Dummy)
-- **SearchComponent**: Search input with dropdown (not connected)
-- **SearchResults**: Search results page (mock data)
-- **Network Components**: Connection suggestions and stats
-- **Notification Components**: Notification system UI
-
-## 🚀 Performance Features
-
-- **Virtualized Lists**: Efficient rendering for large datasets
-- **Lazy Loading**: Components load on demand
-- **Memoized Components**: Optimized re-renders
-- **Shared Event Listeners**: Reduced DOM listeners
-- **Responsive Design**: Mobile-first approach with grid layouts
 
 ## 🤝 Contributing
 
