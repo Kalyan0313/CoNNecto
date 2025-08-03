@@ -1,0 +1,299 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Reset and global styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #0f172a;
+  color: #ffffff;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #374151;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #4b5563;
+}
+
+/* Glass morphism effect */
+.glass-effect {
+  background: rgba(31, 41, 55, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(55, 65, 81, 0.3);
+}
+
+/* Neon border effect */
+.neon-border {
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+}
+
+/* Neon text effect */
+.neon-text {
+  text-shadow: 0 0 10px currentColor;
+}
+
+/* Glow Card Effects */
+[data-glow]::before,
+[data-glow]::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: calc(var(--border-size) * -1);
+  border: var(--border-size) solid transparent;
+  border-radius: calc(var(--radius) * 1px);
+  background-attachment: fixed;
+  background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+}
+
+[data-glow]::before {
+  background-image: radial-gradient(
+    calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px),
+    hsl(var(--hue, 210) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 50) * 1%) / var(--border-spot-opacity, 1)),
+    transparent 100%
+  );
+  filter: brightness(2);
+}
+
+[data-glow]::after {
+  background-image: radial-gradient(
+    calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px),
+    hsl(0 100% 100% / var(--border-light-opacity, 1)),
+    transparent 100%
+  );
+}
+
+[data-glow] [data-glow] {
+  position: absolute;
+  inset: 0;
+  will-change: filter;
+  opacity: var(--outer, 1);
+  border-radius: calc(var(--radius) * 1px);
+  border-width: calc(var(--border-size) * 20);
+  filter: blur(calc(var(--border-size) * 10));
+  background: none;
+  pointer-events: none;
+  border: none;
+}
+
+[data-glow] > [data-glow]::before {
+  inset: -10px;
+  border-width: 10px;
+}
+
+/* Glow Button Effects */
+[data-glow-button]::before,
+[data-glow-button]::after {
+  pointer-events: none;
+  content: "";
+  position: absolute;
+  inset: calc(var(--border-size) * -1);
+  border: var(--border-size) solid transparent;
+  border-radius: calc(var(--radius) * 1px);
+  background-attachment: fixed;
+  background-size: calc(100% + (2 * var(--border-size))) calc(100% + (2 * var(--border-size)));
+  background-repeat: no-repeat;
+  background-position: 50% 50%;
+  mask: linear-gradient(transparent, transparent), linear-gradient(white, white);
+  mask-clip: padding-box, border-box;
+  mask-composite: intersect;
+}
+
+[data-glow-button]::before {
+  background-image: radial-gradient(
+    calc(var(--spotlight-size) * 0.75) calc(var(--spotlight-size) * 0.75) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px),
+    hsl(var(--hue, 210) calc(var(--saturation, 100) * 1%) calc(var(--lightness, 50) * 1%) / var(--border-spot-opacity, 1)),
+    transparent 100%
+  );
+  filter: brightness(2);
+}
+
+[data-glow-button]::after {
+  background-image: radial-gradient(
+    calc(var(--spotlight-size) * 0.5) calc(var(--spotlight-size) * 0.5) at calc(var(--x, 0) * 1px) calc(var(--y, 0) * 1px),
+    hsl(0 100% 100% / var(--border-light-opacity, 1)),
+    transparent 100%
+  );
+}
+
+[data-glow-button] [data-glow-button] {
+  position: absolute;
+  inset: 0;
+  will-change: filter;
+  opacity: var(--outer, 1);
+  border-radius: calc(var(--radius) * 1px);
+  border-width: calc(var(--border-size) * 20);
+  filter: blur(calc(var(--border-size) * 10));
+  background: none;
+  pointer-events: none;
+  border: none;
+}
+
+[data-glow-button] > [data-glow-button]::before {
+  inset: -10px;
+  border-width: 10px;
+}
+
+/* Custom colors */
+:root {
+  --neon-blue: #3b82f6;
+  --neon-purple: #8b5cf6;
+  --neon-pink: #ec4899;
+  --neon-green: #10b981;
+  --neon-red: #ef4444;
+  --neon-yellow: #f59e0b;
+  --neon-orange: #f97316;
+  --neon-cyan: #06b6d4;
+  --neon-indigo: #6366f1;
+  --neon-emerald: #059669;
+  --neon-teal: #14b8a6;
+  --neon-lime: #84cc16;
+  --neon-amber: #fbbf24;
+  --neon-rose: #fb7185;
+  --neon-violet: #a855f7;
+  --neon-fuchsia: #d946ef;
+  --neon-sky: #0ea5e9;
+  --neon-slate: #64748b;
+  --neon-gray: #6b7280;
+  --neon-zinc: #71717a;
+  --neon-neutral: #737373;
+  --neon-stone: #78716c;
+  --neon-red-dark: #dc2626;
+  --neon-orange-dark: #ea580c;
+  --neon-amber-dark: #d97706;
+  --neon-yellow-dark: #ca8a04;
+  --neon-lime-dark: #65a30d;
+  --neon-green-dark: #16a34a;
+  --neon-emerald-dark: #059669;
+  --neon-teal-dark: #0d9488;
+  --neon-cyan-dark: #0891b2;
+  --neon-sky-dark: #0284c7;
+  --neon-blue-dark: #2563eb;
+  --neon-indigo-dark: #4f46e5;
+  --neon-violet-dark: #7c3aed;
+  --neon-purple-dark: #9333ea;
+  --neon-fuchsia-dark: #c026d3;
+  --neon-pink-dark: #db2777;
+  --neon-rose-dark: #e11d48;
+}
+
+/* Dark theme colors */
+.dark {
+  --dark-900: #0f172a;
+  --dark-800: #1e293b;
+  --dark-700: #334155;
+  --dark-600: #475569;
+  --dark-500: #64748b;
+  --dark-400: #94a3b8;
+  --dark-300: #cbd5e1;
+  --dark-200: #e2e8f0;
+  --dark-100: #f1f5f9;
+  --dark-50: #f8fafc;
+}
+
+/* Shadow effects */
+.shadow-neon-blue {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.shadow-neon-purple {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.shadow-neon-pink {
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+}
+
+.shadow-neon-green {
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.shadow-neon-red {
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+}
+
+/* Animation classes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .glass-effect {
+    background: rgba(31, 41, 55, 0.9);
+  }
+}
+
+/* Focus styles */
+*:focus {
+  outline: 2px solid var(--neon-blue);
+  outline-offset: 2px;
+}
+
+/* Selection styles */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: #ffffff;
+}
+
+::-moz-selection {
+  background: rgba(59, 130, 246, 0.3);
+  color: #ffffff;
+} 
