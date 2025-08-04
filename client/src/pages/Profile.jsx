@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Edit3, Save, X, User } from 'lucide-react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import { Edit3, Save, X, User, Loader2 } from 'lucide-react'
 import { useAppSelector, useAppDispatch } from '../store/hooks'
 import api from '../utils/axios'
 import toast from 'react-hot-toast'
@@ -12,11 +12,22 @@ const Profile = () => {
   const { user } = useAppSelector(state => state.auth)
   const [posts, setPosts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [editing, setEditing] = useState(false)
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 20,
+    total: 0,
+    pages: 0,
+    hasMore: true
+  })
   const [formData, setFormData] = useState({
     name: user?.name || '',
     bio: user?.bio || ''
   })
+
+  // Ref for intersection observer
+  const loadMoreRef = useRef(null)
 
   useEffect(() => {
     if (user) {
@@ -24,19 +35,80 @@ const Profile = () => {
     }
   }, [user])
 
-  const fetchUserPosts = async () => {
+  // Intersection observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (entry.isIntersecting && pagination.hasMore && !loadingMore) {
+          loadMorePosts()
+        }
+      },
+      {
+        rootMargin: '100px', // Start loading 100px before reaching the end
+        threshold: 0.1
+      }
+    )
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current)
+    }
+
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current)
+      }
+    }
+  }, [pagination.hasMore, loadingMore])
+
+  const fetchUserPosts = useCallback(async (page = 1, append = false) => {
     if (!user?._id) return
     
     try {
-      const response = await api.get(`/api/posts/user/${user._id}`)
-      const postsData = response.data.data?.posts || response.data.data || response.data
-      setPosts(Array.isArray(postsData) ? postsData : [])
+      const isInitialLoad = page === 1 && !append
+      if (isInitialLoad) {
+        setLoading(true)
+      } else {
+        setLoadingMore(true)
+      }
+
+      const response = await api.get(`/api/posts/user/${user._id}`, {
+        params: {
+          page,
+          limit: pagination.limit
+        }
+      })
+      
+      const data = response.data.data || response.data
+      const newPosts = data.posts || []
+      const newPagination = data.pagination || {}
+
+      if (append) {
+        setPosts(prev => [...prev, ...newPosts])
+      } else {
+        setPosts(newPosts)
+      }
+
+      setPagination(prev => ({
+        ...prev,
+        page: newPagination.page || page,
+        total: newPagination.total || 0,
+        pages: newPagination.pages || 0,
+        hasMore: (newPagination.page || page) < (newPagination.pages || 0)
+      }))
     } catch (error) {
       toast.error('Failed to load posts')
     } finally {
       setLoading(false)
+      setLoadingMore(false)
     }
-  }
+  }, [user?._id, pagination.limit])
+
+  const loadMorePosts = useCallback(() => {
+    if (!loadingMore && pagination.hasMore) {
+      fetchUserPosts(pagination.page + 1, true)
+    }
+  }, [loadingMore, pagination.hasMore, pagination.page, fetchUserPosts])
 
   const handleEdit = () => {
     setFormData({
@@ -89,7 +161,7 @@ const Profile = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
         {/* Profile Header - Takes full width on mobile, 1/3 on xl */}
         <div className="xl:col-span-3">
@@ -173,7 +245,7 @@ const Profile = () => {
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-gray-200 dark:border-dark-700">
               <div className="text-center p-4 bg-dark-700/30 rounded-lg">
-                <div className="text-2xl font-bold neon-text">{posts.length}</div>
+                <div className="text-2xl font-bold neon-text">{pagination.total}</div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">Posts</div>
               </div>
               <div className="text-center p-4 bg-dark-700/30 rounded-lg">
@@ -207,13 +279,27 @@ const Profile = () => {
                 </p>
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-6">
+              <div className="space-y-6">
                 {posts.map((post) => (
                   <PostCard 
                     key={post._id} 
                     post={post} 
                   />
                 ))}
+                
+                {/* Infinite Scroll Trigger */}
+                {pagination.hasMore && (
+                  <div ref={loadMoreRef} className="flex justify-center pt-6">
+                    {loadingMore ? (
+                      <div className="flex items-center space-x-2 text-neon-blue">
+                        <Loader2 size={20} className="animate-spin" />
+                        <span>Loading more posts...</span>
+                      </div>
+                    ) : (
+                      <div className="h-4" /> // Invisible trigger for intersection observer
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>

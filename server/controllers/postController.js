@@ -7,7 +7,7 @@ const User = require('../models/User');
 class PostController {
   // Get all posts with pagination
   static getAllPosts = asyncHandler(async (req, res) => {
-    const { page = 1, limit = 10, userId } = req.query;
+    const { page = 1, limit = 20, userId } = req.query; // Increased default limit
     const skip = (page - 1) * limit;
 
     let query = {};
@@ -18,14 +18,17 @@ class PostController {
       query.author = userId;
     }
 
-    const posts = await Post.find(query)
-      .populate('author', 'name email avatar')
-      .populate('comments.user', 'name email avatar')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
-
-    const total = await Post.countDocuments(query);
+    // Use Promise.all for parallel execution and lean() for better performance
+    const [posts, total] = await Promise.all([
+      Post.find(query)
+        .populate('author', 'name email avatar')
+        .populate('comments.user', 'name email avatar')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(), // Use lean for better performance
+      Post.countDocuments(query)
+    ]);
 
     return ResponseHandler.success(res, {
       posts,
@@ -249,26 +252,31 @@ class PostController {
   // Get user's posts
   static getUserPosts = asyncHandler(async (req, res) => {
     const { userId } = req.params;
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 20 } = req.query; // Increased default limit
     const skip = (page - 1) * limit;
 
     if (!validateObjectId(userId)) {
       return ResponseHandler.badRequest(res, 'Invalid user ID');
     }
 
-    const user = await User.findById(userId);
+    // Use lean() for better performance when we don't need to modify the documents
+    const [posts, total] = await Promise.all([
+      Post.find({ author: userId })
+        .populate('author', 'name email avatar')
+        .populate('comments.user', 'name email avatar')
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(parseInt(limit))
+        .lean(), // Use lean for better performance
+      Post.countDocuments({ author: userId })
+    ]);
+
+    // Check if user exists (only if we need user data)
+    const user = await User.findById(userId).select('name email avatar').lean();
+
     if (!user) {
       return ResponseHandler.notFound(res, 'User not found');
     }
-
-    const posts = await Post.find({ author: userId })
-      .populate('author', 'name email avatar')
-      .populate('comments.user', 'name email avatar')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit));
-
-    const total = await Post.countDocuments({ author: userId });
 
     return ResponseHandler.success(res, {
       posts,

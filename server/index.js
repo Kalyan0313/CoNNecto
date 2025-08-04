@@ -2,17 +2,34 @@ const express = require('express');
 const cors = require('cors');
 const connectDB = require('./config/database');
 const { errorHandler } = require('./utils/errorHandler');
+const createIndexes = require('./utils/createIndexes');
+const performanceMonitor = require('./middleware/performance');
 require('dotenv').config();
 
 const app = express();
 
-// Connect to database
-connectDB();
+// Connect to database and create indexes
+const initializeDatabase = async () => {
+  try {
+    await connectDB();
+    await createIndexes();
+    console.log('Database initialized successfully');
+  } catch (error) {
+    console.error('Database initialization failed:', error);
+    process.exit(1);
+  }
+};
+
+// Initialize database
+initializeDatabase();
 
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
+
+// Performance monitoring middleware
+app.use(performanceMonitor);
 
 // Request logging middleware
 app.use((req, res, next) => {
